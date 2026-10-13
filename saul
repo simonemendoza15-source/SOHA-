@@ -1,0 +1,10 @@
+class Lavoratorio(Espacio):
+    mi_lavoratorio = "Laboratorio especializado"
+
+    def __init__(self, id_espacio, capacidad, nombre, equipamiento):
+        super().__init__(id_espacio, capacidad, nombre)
+        self.equipamiento = equipamiento
+
+    def agregar_equipamiento(self, equipo):
+        self.equipamiento.append(equipo)
+        print(f"Agregando {equipo} al laboratorio)
