@@ -1,0 +1,32 @@
+class Horario:    mi_horarioasignado = "Horario de clase"    def __init__(self, 
+id_horario, periodo, estado):        self._id_horario = id_horario        self.periodo = periodo       
+self._estado = estado    def mostrar_estado(self):        
+print(f"Estado: {self._estado}")class LaboratorioUniversitario(Lavoratorio, Docente):   
+def __init__(self, id_espacio, capacidad, nombre, equipamiento,               
+disponibilidad, preferencias, descansos):    
+Lavoratorio.__init__(            self, id_espacio, capacidad, nombre, equipamiento        )  
+Docente.__init__(            
+self, disponibilidad, preferencias, descansos        )    
+def mostrar_informacion(self):
+self.mostrar_nombre()      
+self.mostrar_disponibilidad()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
