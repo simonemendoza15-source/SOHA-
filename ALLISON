@@ -1,0 +1,17 @@
+
+class Espacio:
+    po_categoria = "Infraestructura Educativa"
+
+    def __init__(self, id_espacio, capacidad, nombre):
+        self.__id_espacio = id_espacio
+        self.__capacidad = capacidad
+        self.nombre = nombre
+
+    def mostrar_nombre(self):
+        print(f"Laboratorio: {self.nombre}")
+
+    def mostrar_capacidad(self):
+        print(f"Capacidad: {self.__capacidad}")
+
+    def evaluar_capacidad(self, limite):
+        print(f"Evaluando capacidad contra {limite} estudiantes")
