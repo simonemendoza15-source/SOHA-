@@ -1,0 +1,170 @@
+class Espacio:
+    po_categoria = "Infraestructura Educativa"
+
+    def __init__(self, id_espacio: int, capacidad: int, nombre: str):
+        self._id_espacio = id_espacio
+        self._capacidad = capacidad
+        self.nombre = nombre
+
+    def idespacio(self):
+        print(f"ID del espacio: {self._id_espacio}")
+
+    def evaluar_capacidad(self, limite: int):
+        print(f"Capacidad: {self._capacidad} estudiantes")
+        print(f"Evaluando capacidad contra {limite} estudiantes")
+
+    def mostrar_nombre(self):
+        print(f"Espacio de practica: {self.nombre}")
+
+
+class Lavoratorio(Espacio):
+    mi_lavoratorio = "Laboratorio especializado"
+
+    def __init__(self, id_espacio: int, capacidad: int, equipamiento: list):
+        super().__init__(id_espacio, capacidad, "Laboratorio de practica")
+        self._equipamiento = equipamiento
+
+    def id_espacio(self):
+        print(f"ID del laboratorio: {self._id_espacio}")
+
+    def agregar_equipamiento(self, nuevo_equipo: str):
+        self._equipamiento.append(nuevo_equipo)
+        print(f"Agregando {nuevo_equipo} al laboratorio")
+
+    def mostrar_capacidad(self):
+        print(f"Capacidad para {self._capacidad} estudiantes")
+
+    def mostrar_equipamiento(self):
+        print(f"Equipamiento: {self._equipamiento}")
+
+
+class Paralelo:
+    mi_paralelo = "Paralelo"
+
+    def __init__(self, id_paralelo: int, num_estudiantes: int, nombre_paralelo: str):
+        self._id_paralelo = id_paralelo
+        self._num_estudiantes = num_estudiantes
+        self.nombre_paralelo = nombre_paralelo
+
+    def idparaleo(self):
+        print(f"ID del paralelo: {self._id_paralelo}")
+
+    def agregar_estudiantes(self, cantidad: int):
+        self._num_estudiantes += cantidad
+        print(f"Se agregaron {cantidad} estudiantes")
+        print(f"Total de estudiantes: {self._num_estudiantes}")
+
+    def mostrar_nombre_paralelo(self):
+        print(f"Paralelo: {self.nombre_paralelo}")
+
+
+class Docente:
+    mi_docente = "Materia de docente"
+
+    def __init__(self, disponibilidad: list, preferencias: str, descansos: list):
+        self._disponibilidad = disponibilidad
+        self._preferencias = preferencias
+        self.descansos = descansos
+
+    def disponibilidad(self):
+        print(f"Disponibilidad: {self._disponibilidad}")
+
+    def cambiar_preferencias(self, nueva_pref: str):
+        self._preferencias = nueva_pref
+        print(f"Nueva preferencia docente: {nueva_pref}")
+
+    def mostrar_descansos(self):
+        print(f"Descansos: {self.descansos}")
+
+
+class Horario:
+    mi_horarioasignado = "Horario de clase"
+
+    def __init__(self, id_horario: int, periodo: str, estado: str):
+        self._id_horario = id_horario
+        self._estado = estado
+        self.periodo = periodo
+
+    def id_horario(self):
+        print(f"Horario ID: {self._id_horario}")
+
+    def cambiar_periodo(self, nuevo_periodo: str):
+        self.periodo = nuevo_periodo
+        print(f"Nuevo periodo: {self.periodo}")
+
+    def mostrar_estado(self):
+        print(f"Estado del horario: {self._estado}")
+
+
+class LaboratorioUniversitario(Lavoratorio, Docente):
+    def __init__(self, id_espacio: int, capacidad: int, equipamiento: list,
+                 disponibilidad: list, preferencias: str, descansos: list):
+        Lavoratorio.__init__(self, id_espacio, capacidad, equipamiento)
+        Docente.__init__(self, disponibilidad, preferencias, descansos)
+
+    def mostrar_informacion_completa(self):
+        print("=== LABORATORIO UNIVERSITARIO ===")
+        self.mostrar_nombre()
+        self.mostrar_capacidad()
+        self.mostrar_equipamiento()
+        self.disponibilidad()
+        self.mostrar_descansos()
+
+
+if __name__ == "__main__":
+    print("=== 1. CLASE ESPACIO ===")
+    e1 = Espacio(1, 30, "Lab 1")
+    e1.idespacio()
+    e1.evaluar_capacidad(25)
+    e1.mostrar_nombre()
+
+    print("\n=== 2. HERENCIA SIMPLE ===")
+    l1 = Lavoratorio(101, 20, ["Computadoras"])
+    l1.id_espacio()
+    l1.mostrar_nombre()
+    l1.agregar_equipamiento("Router")
+    l1.mostrar_equipamiento()
+    l1.mostrar_capacidad()
+
+    print("\n=== 3. CLASE PARALELO ===")
+    p1 = Paralelo(704, 35, "Sistemas A")
+    p1.idparaleo()
+    p1.agregar_estudiantes(5)
+    p1.mostrar_nombre_paralelo()
+
+    print("\n=== 4. CLASE DOCENTE ===")
+    d1 = Docente(["Jueves"], "Electronica", ["Martes"])
+    d1.disponibilidad()
+    d1.cambiar_preferencias("Sistemas")
+    d1.mostrar_descansos()
+
+    print("\n=== 5. CLASE HORARIO ===")
+    h1 = Horario(501, "2026-2", "Activo")
+    h1.id_horario()
+    h1.cambiar_periodo("2026-3")
+    h1.mostrar_estado()
+
+    print("\n=== 6. HERENCIA MULTIPLE ===")
+    lu1 = LaboratorioUniversitario(
+        201,
+        25,
+        ["Computadoras", "Router"],
+        ["Lunes", "Jueves"],
+        "Redes",
+        ["Viernes"]
+    )
+    lu1.mostrar_informacion_completa()
+    lu1.agregar_equipamiento("Switch")
+    lu1.cambiar_preferencias("Seguridad informatica")
+
+    print("\n=== 7. ATRIBUTO DE CLASE ===")
+    lab1 = Lavoratorio(1, 10, [])
+    lab2 = Lavoratorio(2, 10, [])
+
+    print("Original:", lab1.mi_lavoratorio)
+    print("Original:", lab2.mi_lavoratorio)
+
+    Lavoratorio.mi_lavoratorio = "Laboratorio de alta tecnologia"
+
+    print("Modificado:", lab1.mi_lavoratorio)
+    print("Modificado:", lab2.mi_lavoratorio)
