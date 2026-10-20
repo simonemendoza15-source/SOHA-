@@ -13,6 +13,10 @@ class Espacio:
         print(f"Capacidad: {self._capacidad} estudiantes")
         print(f"Evaluando capacidad contra {limite} estudiantes")
 
+    def tiene_capacidad(self, num_estudiantes: int) -> bool:
+          return self._capacidad >= num_estudiantes
+
+
     def mostrar_nombre(self):
         print(f"Espacio de practica: {self.nombre}")
 
@@ -116,7 +120,9 @@ if __name__ == "__main__":
     e1 = Espacio(1, 30, "Lab 1")
     e1.idespacio()
     e1.evaluar_capacidad(25)
-    e1.mostrar_nombre()
+    e1.mostrar_nombre
+    print("¿Cabe un paralelo de 35?", e1.tiene_capacidad(35))
+ 
 
     print("\n=== 2. HERENCIA SIMPLE ===")
     l1 = Lavoratorio(101, 20, ["Computadoras"])
