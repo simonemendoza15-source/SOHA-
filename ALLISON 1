@@ -1,17 +1,148 @@
+from __future__ import annotations
 
-class Espacio:
-    po_categoria = "Infraestructura Educativa"
+import hashlib
+import hmac
+import os
+from abc import ABC, abstractmethod
+from datetime import time
+from typing import Callable
 
-    def __init__(self, id_espacio, capacidad, nombre):
-        self.__id_espacio = id_espacio
-        self.__capacidad = capacidad
-        self.nombre = nombre
+DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
 
-    def mostrar_nombre(self):
-        print(f"Laboratorio: {self.nombre}")
 
-    def mostrar_capacidad(self):
-        print(f"Capacidad: {self.__capacidad}")
+class BloqueHorario:
 
-    def evaluar_capacidad(self, limite):
-        print(f"Evaluando capacidad contra {limite} estudiantes")
+    def __init__(self, dia: str, hora_inicio: time, hora_fin: time):
+        if hora_inicio >= hora_fin:
+            raise ValueError("hora_inicio debe ser menor que hora_fin")
+        self.dia = dia
+        self.hora_inicio = hora_inicio
+        self.hora_fin = hora_fin
+
+    def se_solapa_con(self, otro: BloqueHorario) -> bool:
+        return (self.dia == otro.dia
+                and self.hora_inicio < otro.hora_fin
+                and otro.hora_inicio < self.hora_fin)
+
+    def contiene(self, otro: BloqueHorario) -> bool:
+        return (self.dia == otro.dia
+                and self.hora_inicio <= otro.hora_inicio
+                and otro.hora_fin <= self.hora_fin)
+
+    def duracion_horas(self) -> float:
+        ini = self.hora_inicio.hour + self.hora_inicio.minute / 60
+        fin = self.hora_fin.hour + self.hora_fin.minute / 60
+        return fin - ini
+
+    def __str__(self) -> str:
+        return f"{self.dia} {self.hora_inicio:%H:%M}-{self.hora_fin:%H:%M}"
+
+
+class Usuario(ABC):
+    mi_categoria = "Actor del sistema"
+
+    def __init__(self, id_usuario: int, nombre: str, email: str, contrasena: str):
+        self._id_usuario = id_usuario
+        self._nombre = nombre
+        self._email = email
+        self._salt = os.urandom(16)
+        self._hash = self._cifrar(contrasena)
+        self._sesion_activa = False
+
+    def _cifrar(self, contrasena: str) -> bytes:
+        return hashlib.pbkdf2_hmac("sha256", contrasena.encode(), self._salt, 100_000)
+
+    def _validar_credenciales(self, email: str, contrasena: str) -> bool:
+        return (email == self._email
+                and hmac.compare_digest(self._hash, self._cifrar(contrasena)))
+
+    def iniciar_sesion(self, email: str, contrasena: str) -> bool:
+        self._sesion_activa = self._validar_credenciales(email, contrasena)
+        estado = "exitoso" if self._sesion_activa else "fallido"
+        print(f"Inicio de sesión {estado}: {self._nombre}")
+        return self._sesion_activa
+
+    def cerrar_sesion(self) -> None:
+        self._sesion_activa = False
+        print(f"Sesión cerrada: {self._nombre}")
+
+    @property
+    def nombre(self) -> str:
+        return self._nombre
+
+    @abstractmethod
+    def rol(self) -> str:
+        ...
+
+
+class Docente(Usuario):
+    mi_docente = "Docente universitario"
+
+    def __init__(self, id_usuario: int, nombre: str, email: str, contrasena: str,
+                 disponibilidad=None,
+                 preferencias: str = "",
+                 descansos=None):
+        super().__init__(id_usuario, nombre, email, contrasena)
+        self._disponibilidad = list(disponibilidad or [])
+        self._preferencias = preferencias
+        self._descansos = list(descansos or [])
+
+    def rol(self) -> str:
+        return "Docente"
+
+    def registrar_disponibilidad(self, bloques):
+        self._disponibilidad.extend(bloques)
+        print(f"{self._nombre}: {len(bloques)} bloque(s) de disponibilidad registrados")
+
+    def cambiar_preferencias(self, nueva_pref: str):
+        self._preferencias = nueva_pref
+        print(f"Nueva preferencia de {self._nombre}: {nueva_pref}")
+
+    def esta_disponible(self, bloque) -> bool:
+        dentro = any(d.contiene(bloque) for d in self._disponibilidad)
+        en_descanso = any(r.se_solapa_con(bloque) for r in self._descansos)
+        return dentro and not en_descanso
+
+    def consultar_horario(self, horarios):
+        return [h for h in horarios if h.docente is self]
+
+
+class Estudiante(Usuario):
+
+    def __init__(self, id_usuario: int, nombre: str, email: str, contrasena: str,
+                 carrera: str, paralelos=None):
+        super().__init__(id_usuario, nombre, email, contrasena)
+        self._carrera = carrera
+        self._paralelos = list(paralelos or [])
+
+    def rol(self) -> str:
+        return "Estudiante"
+
+    def consultar_horario(self, horarios):
+        return [h for h in horarios if h.paralelo in self._paralelos]
+
+
+class Administrador(Usuario):
+
+    def __init__(self, id_usuario: int, nombre: str, email: str, contrasena: str,
+                 rol_academico: str = "Coordinador"):
+        super().__init__(id_usuario, nombre, email, contrasena)
+        self._rol_academico = rol_academico
+        self._espacios = []
+        self._bloques = []
+        self._docentes = []
+        self._materias = []
+
+    def rol(self) -> str:
+        return "Administrador"
+
+    def ingresar_datos(self, espacios, bloques):
+        self._espacios.extend(espacios)
+        self._bloques.extend(bloques)
+        print(f"Datos ingresados: {len(espacios)} espacios, {len(bloques)} bloques")
+
+    def registrar_docente(self, docente):
+        self._docentes.append(docente)
+
+    def registrar_materia(self, materia):
+        self._materias.append(materia)
