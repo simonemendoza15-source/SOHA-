@@ -1,4 +1,7 @@
-class Espacio:
+from abc import ABC, abstractmethod
+
+
+class Espacio(ABC):
     mi_categoria = "Infraestructura Educativa"
 
     def __init__(self, id_espacio: int, capacidad: int, nombre: str):
@@ -17,9 +20,12 @@ class Espacio:
     def tiene_capacidad(self, num_estudiantes: int) -> bool:
         return self._capacidad >= num_estudiantes
 
-
     def mostrar_nombre(self):
         print(f"Espacio de practica: {self.nombre}")
+
+    @abstractmethod
+    def descripcion(self) -> str:
+        pass
 
 
 class Laboratorio(Espacio):
@@ -27,7 +33,7 @@ class Laboratorio(Espacio):
 
     def __init__(self, id_espacio: int, capacidad: int, equipamiento: list):
         super().__init__(id_espacio, capacidad, "Laboratorio de practica")
-        self._equipamiento = equipamiento
+        self._equipamiento = list(equipamiento)
 
     def id_espacio(self):
         print(f"ID del laboratorio: {self._id_espacio}")
@@ -42,6 +48,13 @@ class Laboratorio(Espacio):
     def mostrar_equipamiento(self):
         print(f"Equipamiento: {self._equipamiento}")
 
+    def descripcion(self) -> str:
+        return f"Laboratorio de {self._capacidad} cupos con {len(self._equipamiento)} equipos"
+
+class Aula(Espacio):
+    def descripcion(self) -> str:
+        return f"Aula {self.nombre} con {self._capacidad} cupos"
+ 
 
 class Paralelo:
     mi_paralelo = "Paralelo"
@@ -51,7 +64,7 @@ class Paralelo:
         self._num_estudiantes = num_estudiantes
         self.nombre_paralelo = nombre_paralelo
 
-    def id_paraleo(self):
+    def id_paralelo(self):
         print(f"ID del paralelo: {self._id_paralelo}")
 
     def agregar_estudiantes(self, cantidad: int):
@@ -126,10 +139,10 @@ class Planificador:
         for h in self.horarios:
             print(f"{h.dia} {h.hora} | {h.espacio.nombre} | {h.paralelo.nombre_paralelo}")
 
-class LaboratorioUniversitario(Lavoratorio, Docente):
+class LaboratorioUniversitario(Laboratorio, Docente):
     def __init__(self, id_espacio: int, capacidad: int, equipamiento: list,
                  disponibilidad: list, preferencias: str, descansos: list):
-        Lavoratorio.__init__(self, id_espacio, capacidad, equipamiento)
+        Laboratorio.__init__(self, id_espacio, capacidad, equipamiento)
         Docente.__init__(self, disponibilidad, preferencias, descansos)
 
     def mostrar_informacion_completa(self):
@@ -143,15 +156,15 @@ class LaboratorioUniversitario(Lavoratorio, Docente):
 
 if __name__ == "__main__":
     print("=== 1. CLASE ESPACIO ===")
-    e1 = Espacio(1, 30, "Lab 1")
-    e1.idespacio()
+    e1 = Aula(1, 30, "Lab 1")
+    e1.id_espacio()
     e1.evaluar_capacidad(25)
-    e1.mostrar_nombre
+    e1.mostrar_nombre()
     print("¿Cabe un paralelo de 35?", e1.tiene_capacidad(35))
  
 
     print("\n=== 2. HERENCIA SIMPLE ===")
-    l1 = Lavoratorio(101, 20, ["Computadoras"])
+    l1 = Laboratorio(101, 20, ["Computadoras"])
     l1.id_espacio()
     l1.mostrar_nombre()
     l1.agregar_equipamiento("Router")
@@ -160,7 +173,7 @@ if __name__ == "__main__":
 
     print("\n=== 3. CLASE PARALELO ===")
     p1 = Paralelo(704, 35, "Sistemas A")
-    p1.idparaleo()
+    p1.id_paralelo()
     p1.agregar_estudiantes(5)
     p1.mostrar_nombre_paralelo()
 
@@ -190,13 +203,13 @@ if __name__ == "__main__":
     lu1.cambiar_preferencias("Seguridad informatica")
 
     print("\n=== 7. ATRIBUTO DE CLASE ===")
-    lab1 = Lavoratorio(1, 10, [])
-    lab2 = Lavoratorio(2, 10, [])
+    lab1 = Laboratorio(1, 10, [])
+    lab2 = Laboratorio(2, 10, [])
 
-    print("Original:", lab1.mi_lavoratorio)
-    print("Original:", lab2.mi_lavoratorio)
+    print("Original:", lab1.mi_laboratorio)
+    print("Original:", lab2.mi_laboratorio)
 
-    Lavoratorio.mi_lavoratorio = "Laboratorio de alta tecnologia"
+    Laboratorio.mi_laboratorio = "Laboratorio de alta tecnologia"
 
-    print("Modificado:", lab1.mi_lavoratorio)
-    print("Modificado:", lab2.mi_lavoratorio)
+    print("Modificado:", lab1.mi_laboratorio)
+    print("Modificado:", lab2.mi_laboratorio)
