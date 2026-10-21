@@ -1,28 +1,29 @@
 class Espacio:
-    po_categoria = "Infraestructura Educativa"
+    mi_categoria = "Infraestructura Educativa"
 
     def __init__(self, id_espacio: int, capacidad: int, nombre: str):
         self._id_espacio = id_espacio
         self._capacidad = capacidad
         self.nombre = nombre
 
-    def idespacio(self):
+    def id_espacio(self):
         print(f"ID del espacio: {self._id_espacio}")
 
-    def evaluar_capacidad(self, limite: int):
+    def evaluar_capacidad(self, limite: int) -> bool:
         print(f"Capacidad: {self._capacidad} estudiantes")
         print(f"Evaluando capacidad contra {limite} estudiantes")
+        return self.tiene_capacidad(limite)
 
     def tiene_capacidad(self, num_estudiantes: int) -> bool:
-          return self._capacidad >= num_estudiantes
+        return self._capacidad >= num_estudiantes
 
 
     def mostrar_nombre(self):
         print(f"Espacio de practica: {self.nombre}")
 
 
-class Lavoratorio(Espacio):
-    mi_lavoratorio = "Laboratorio especializado"
+class Laboratorio(Espacio):
+    mi_laboratorio = "Laboratorio especializado"
 
     def __init__(self, id_espacio: int, capacidad: int, equipamiento: list):
         super().__init__(id_espacio, capacidad, "Laboratorio de practica")
@@ -50,7 +51,7 @@ class Paralelo:
         self._num_estudiantes = num_estudiantes
         self.nombre_paralelo = nombre_paralelo
 
-    def idparaleo(self):
+    def id_paraleo(self):
         print(f"ID del paralelo: {self._id_paralelo}")
 
     def agregar_estudiantes(self, cantidad: int):
@@ -99,6 +100,31 @@ class Horario:
     def mostrar_estado(self):
         print(f"Estado del horario: {self._estado}")
 
+class Planificador:
+    def __init__(self):
+        self.horarios = []
+
+    def hay_conflicto(self, nuevo: Horario) -> bool:
+        for h in self.horarios:
+            if h.dia == nuevo.dia and h.hora == nuevo.hora:
+                if (h.espacio is nuevo.espacio
+                  or h.docente is nuevo.docente
+                  or h.paralelo is nuevo.paralelo):
+                    return True
+        return False
+
+    def agregar(self, horario: Horario):
+        if not horario.es_valido():
+            print("No se agrego: horario no valido")
+        elif self.hay_conflicto(horario):
+            print("No se agrego: hay conflicto con otro horario")
+        else:
+            self.horarios.append(horario)
+            print("Horario agregado correctamente")
+
+    def mostrar_horarios(self):
+        for h in self.horarios:
+            print(f"{h.dia} {h.hora} | {h.espacio.nombre} | {h.paralelo.nombre_paralelo}")
 
 class LaboratorioUniversitario(Lavoratorio, Docente):
     def __init__(self, id_espacio: int, capacidad: int, equipamiento: list,
