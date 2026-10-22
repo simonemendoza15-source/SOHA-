@@ -1,16 +1,47 @@
-class Horario:    mi_horarioasignado = "Horario de clase"    def __init__(self, 
-id_horario, periodo, estado):        self._id_horario = id_horario        self.periodo = periodo       
-self._estado = estado    def mostrar_estado(self):        
-print(f"Estado: {self._estado}")class LaboratorioUniversitario(Lavoratorio, Docente):   
-def __init__(self, id_espacio, capacidad, nombre, equipamiento,               
-disponibilidad, preferencias, descansos):    
-Lavoratorio.__init__(            self, id_espacio, capacidad, nombre, equipamiento        )  
-Docente.__init__(            
-self, disponibilidad, preferencias, descansos        )    
-def mostrar_informacion(self):
-self.mostrar_nombre()      
-self.mostrar_disponibilidad()
+class Horario:
+    mi_horarioasignado = "Horario de clase"
 
+    def __init__(self, id_horario, periodo, estado):
+        self._id_horario = id_horario
+        self.periodo = periodo
+        self._estado = estado
+
+    def mostrar_estado(self):
+        print(f"Estado: {self._estado}")
+
+
+# Suposición de clases base para que el ejemplo sea funcional (ajusta según tus otras clases)
+class Laboratorio:
+    def __init__(self, id_espacio, capacidad, nombre, equipamiento):
+        self.id_espacio = id_espacio
+        self.capacidad = capacidad
+        self.nombre = nombre
+        self.equipamiento = equipamiento
+
+    def mostrar_nombre(self):
+        print(f"Nombre del laboratorio: {self.nombre}")
+
+
+class Docente:
+    def __init__(self, disponibilidad, preferencias, descansos):
+        self.disponibilidad = disponibilidad
+        self.preferencias = preferencias
+        self.descansos = descansos
+
+    def mostrar_disponibilidad(self):
+        print(f"Disponibilidad: {self.disponibilidad}")
+
+
+class LaboratorioUniversitario(Laboratorio, Docente):
+    def __init__(self, id_espacio, capacidad, nombre, equipamiento, disponibilidad, preferencias, descansos):
+        # Inicializamos la primera clase base con super()
+        Laboratorio.__init__(self, id_espacio, capacidad, nombre, equipamiento)
+        # Inicializamos la segunda clase base de forma explícita por herencia múltiple
+        Docente.__init__(self, disponibilidad, preferencias, descansos)
+
+    def mostrar_informacion(self):
+        self.mostrar_nombre()
+        self.mostrar_disponibilidad()
 
 
 
