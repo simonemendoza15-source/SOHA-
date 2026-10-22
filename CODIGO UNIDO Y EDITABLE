@@ -98,13 +98,23 @@ class Docente:
 class Horario:
     mi_horarioasignado = "Horario de clase"
 
-    def __init__(self, id_horario: int, periodo: str, estado: str):
+    def __init__(self, id_horario: int, periodo: str, estado: str,
+                 dia: str, hora: str,
+                 espacio: Espacio, docente: Docente, paralelo: Paralelo):
         self._id_horario = id_horario
         self._estado = estado
         self.periodo = periodo
+        self.dia = dia
+        self.hora = hora
+        self.espacio = espacio
+        self.docente = docente
+        self.paralelo = paralelo
 
     def id_horario(self):
         print(f"Horario ID: {self._id_horario}")
+
+    def es_valido(self) -> bool:
+        return self.espacio.tiene_capacidad(self.paralelo._num_estudiantes)
 
     def cambiar_periodo(self, nuevo_periodo: str):
         self.periodo = nuevo_periodo
@@ -139,9 +149,51 @@ class Planificador:
         for h in self.horarios:
             print(f"{h.dia} {h.hora} | {h.espacio.nombre} | {h.paralelo.nombre_paralelo}")
 
+class Reporte(ABC):
+    def __init__(self, titulo: str, planificador: Planificador):
+        self.titulo = titulo
+        self._planificador = planificador
+
+    def mostrar(self):
+        print(f"--- {self.titulo} ---")
+        print(self.generar())
+
+    @abstractmethod
+    def generar(self) -> str:
+        pass
+
+
+class ReporteHorarios(Reporte):
+    def __init__(self, planificador: Planificador):
+        super().__init__("Reporte de horarios", planificador)
+
+    def generar(self) -> str:
+        if not self._planificador.horarios:
+            return "No hay horarios registrados"
+        lineas = []
+        for h in self._planificador.horarios:
+            lineas.append(f"{h.dia} {h.hora} | {h.espacio.nombre} | {h.paralelo.nombre_paralelo}")
+        return "\n".join(lineas)
+
+
+class ReporteOcupacion(Reporte):
+    def __init__(self, planificador: Planificador):
+        super().__init__("Reporte de ocupacion", planificador)
+
+    def generar(self) -> str:
+        if not self._planificador.horarios:
+            return "No hay horarios registrados"
+        lineas = []
+        for h in self._planificador.horarios:
+            usados = h.paralelo._num_estudiantes
+            total = h.espacio._capacidad
+            porcentaje = usados / total * 100
+            lineas.append(f"{h.espacio.nombre}: {usados}/{total} estudiantes ({porcentaje:.0f}%)")
+        return "\n".join(lineas)
+
 class LaboratorioUniversitario(Laboratorio, Docente):
     def __init__(self, id_espacio: int, capacidad: int, equipamiento: list,
-                 disponibilidad: list, preferencias: str, descansos: list):
+        disponibilidad: list, preferencias: str, descansos: list):
         Laboratorio.__init__(self, id_espacio, capacidad, equipamiento)
         Docente.__init__(self, disponibilidad, preferencias, descansos)
 
@@ -156,7 +208,7 @@ class LaboratorioUniversitario(Laboratorio, Docente):
 
 if __name__ == "__main__":
     print("=== 1. CLASE ESPACIO ===")
-    e1 = Aula(1, 30, "Lab 1")
+    e1 = Aula(1, 50, "Aula 1")
     e1.id_espacio()
     e1.evaluar_capacidad(25)
     e1.mostrar_nombre()
@@ -184,7 +236,7 @@ if __name__ == "__main__":
     d1.mostrar_descansos()
 
     print("\n=== 5. CLASE HORARIO ===")
-    h1 = Horario(501, "2026-2", "Activo")
+    h1 = Horario(501, "2026-2", "Activo", "Lunes", "08:00", e1, d1, p1)
     h1.id_horario()
     h1.cambiar_periodo("2026-3")
     h1.mostrar_estado()

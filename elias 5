@@ -1,24 +1,26 @@
 if __name__ == "__main__":
-    e1 = Espacio(1, 30, "Lab 1")
+    e1 = Aula(1, 30, "Aula 1")
     e1.mostrar_nombre()
     e1.evaluar_capacidad(25)
-    e1.mostrar_capacidad()
 
-    l1 = Lavoratorio(101, 20, "Laboratorio de redes", ["PC"])
+    l1 = Laboratorio(101, 20, ["PC"])
     l1.mostrar_nombre()
     l1.agregar_equipamiento("Router")
+    l1.mostrar_capacidad()
 
     p1 = Paralelo(704, 35, "Sistemas")
     p1.mostrar_nombre_paralelo()
 
     d1 = Docente(["Jueves"], "Electronica", ["Martes"])
-    d1.mostrar_disponibilidad()
+    d1.disponibilidad()
 
-    h1 = Horario(501, "2026-2", "Activo")
+    h1 = Horario(501, "2026-2", "Activo", "Lunes", "08:00", e1, d1, p1)
     h1.mostrar_estado()
 
     lu1 = LaboratorioUniversitario(
-        201, 25, "Laboratorio universitario",
-        ["Computadoras"], ["Lunes"], "Redes", ["Viernes"]
+        201, 25, ["Computadoras"], ["Lunes"], "Redes", ["Viernes"]
     )
-    lu1.mostrar_informacion()
+    lu1.mostrar_informacion_completa()
+
+
+    
