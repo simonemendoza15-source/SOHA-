@@ -1,5 +1,240 @@
-class Paralelo:    mi_paralelo = "Paralelo"    def __init__(self, id_paralelo, num_estudiantes, nombre_paralelo):       
-self._id_paralelo = id_paralelo        self._num_estudiantes = num_estudiantes        self.nombre_paralelo = nombre_paralelo    
-def mostrar_nombre_paralelo(self):        print(f"Paralelo: {self.nombre_paralelo}")class Docente:    mi_docente = "Materia de docente"   
-def __init__(self, disponibilidad, preferencias, descansos):        self._disponibilidad = disponibilidad        self._preferencias = preferencias        
-self.descansos = descansos    def mostrar_disponibilidad(self):        print(f"Disponibilidad: {self._disponibilidad}")
+Codigo opcional
+
+from abc import ABC, abstractmethod
+
+
+# =========================
+# CLASE ESPACIO
+# =========================
+class Espacio(ABC):
+    categoria = "Infraestructura Educativa"
+
+    def __init__(self, id_espacio, capacidad, nombre):
+        if capacidad <= 0:
+            raise ValueError("La capacidad debe ser mayor que cero")
+
+        self.id_espacio = id_espacio
+        self.capacidad = capacidad
+        self.nombre = nombre
+
+    def tiene_capacidad(self, estudiantes):
+        return self.capacidad >= estudiantes
+
+    @abstractmethod
+    def descripcion(self):
+        pass
+
+
+# =========================
+# HERENCIA SIMPLE
+# =========================
+class Laboratorio(Espacio):
+    tipo = "Laboratorio"
+
+    def __init__(self, id_espacio, capacidad, nombre, equipos=None):
+        super().__init__(id_espacio, capacidad, nombre)
+        self.equipos = list(equipos) if equipos else []
+
+    def agregar_equipo(self, equipo):
+        if equipo.strip():
+            self.equipos.append(equipo)
+            print("Equipo agregado correctamente")
+
+    def descripcion(self):
+        return (
+            f"{self.nombre} | Capacidad: {self.capacidad} | "
+            f"Equipos: {len(self.equipos)}"
+        )
+
+
+class Aula(Espacio):
+    tipo = "Aula"
+
+    def descripcion(self):
+        return f"{self.nombre} | Capacidad: {self.capacidad}"
+
+
+# =========================
+# CLASE DOCENTE
+# =========================
+class Docente:
+    def __init__(self, id_docente, nombre, materia):
+        self.id_docente = id_docente
+        self.nombre = nombre
+        self.materia = materia
+
+    def __str__(self):
+        return f"{self.nombre} - {self.materia}"
+
+
+# =========================
+# CLASE PARALELO
+# =========================
+class Paralelo:
+    def __init__(self, nombre, estudiantes):
+        if estudiantes <= 0:
+            raise ValueError("Debe existir al menos un estudiante")
+
+        self.nombre = nombre
+        self.estudiantes = estudiantes
+
+    def __str__(self):
+        return f"{self.nombre} ({self.estudiantes} estudiantes)"
+
+
+# =========================
+# CLASE HORARIO
+# =========================
+class Horario:
+    def __init__(self, id_horario, dia, hora, espacio,
+                 docente, paralelo, materia):
+        self.id_horario = id_horario
+        self.dia = dia
+        self.hora = hora
+        self.espacio = espacio
+        self.docente = docente
+        self.paralelo = paralelo
+        self.materia = materia
+
+    def es_valido(self):
+        return self.espacio.tiene_capacidad(
+            self.paralelo.estudiantes
+        )
+
+    def mostrar(self):
+        print(
+            f"ID: {self.id_horario} | {self.dia} {self.hora} | "
+            f"{self.materia} | {self.docente.nombre} | "
+            f"{self.espacio.nombre} | {self.paralelo.nombre}"
+        )
+
+
+# =========================
+# PLANIFICADOR
+# =========================
+class Planificador:
+    def __init__(self):
+        self.horarios = []
+
+    def agregar(self, nuevo):
+        if not nuevo.es_valido():
+            print("Error: el aula no tiene capacidad suficiente")
+            return
+
+        for horario in self.horarios:
+            mismo_momento = (
+                horario.dia == nuevo.dia
+                and horario.hora == nuevo.hora
+            )
+
+            if mismo_momento:
+                if horario.espacio.id_espacio == nuevo.espacio.id_espacio:
+                    print("Error: el aula ya está ocupada")
+                    return
+
+                if horario.docente.id_docente == nuevo.docente.id_docente:
+                    print("Error: el docente ya tiene una clase")
+                    return
+
+                if horario.paralelo.nombre == nuevo.paralelo.nombre:
+                    print("Error: el paralelo ya tiene una clase")
+                    return
+
+        self.horarios.append(nuevo)
+        print("Horario registrado correctamente")
+
+    def mostrar_todos(self):
+        if not self.horarios:
+            print("Todavía no hay horarios registrados")
+            return
+
+        print("\n===== HORARIOS ACADÉMICOS =====")
+        for horario in self.horarios:
+            horario.mostrar()
+
+    def buscar_por_paralelo(self, nombre):
+        encontrados = [
+            h for h in self.horarios
+            if h.paralelo.nombre.lower() == nombre.lower()
+        ]
+
+        if encontrados:
+            for horario in encontrados:
+                horario.mostrar()
+        else:
+            print("No se encontraron horarios para ese paralelo")
+
+
+# =========================
+# PROGRAMA PRINCIPAL
+# =========================
+def ejecutar():
+    planificador = Planificador()
+
+    aula1 = Aula(1, 40, "Aula 101")
+    lab1 = Laboratorio(
+        2, 25, "Laboratorio de Computación",
+        ["Computadoras", "Router"]
+    )
+
+    docente1 = Docente(1, "Carlos Mendoza", "Programación")
+    docente2 = Docente(2, "Ana López", "Base de Datos")
+
+    paralelo1 = Paralelo("Sistemas A", 30)
+    paralelo2 = Paralelo("Sistemas B", 20)
+
+    while True:
+        print("\n===== SISTEMA DE HORARIOS =====")
+        print("1. Registrar horario de ejemplo")
+        print("2. Mostrar todos los horarios")
+        print("3. Buscar por paralelo")
+        print("4. Mostrar aulas disponibles")
+        print("5. Salir")
+
+        opcion = input("Seleccione una opción: ").strip()
+
+        if opcion == "1":
+            print("\n1. Programación - Sistemas A")
+            print("2. Base de Datos - Sistemas B")
+
+            seleccion = input("Seleccione el horario: ").strip()
+
+            if seleccion == "1":
+                horario = Horario(
+                    1, "Lunes", "08:00",
+                    lab1, docente1, paralelo1, "Programación"
+                )
+            elif seleccion == "2":
+                horario = Horario(
+                    2, "Lunes", "08:00",
+                    aula1, docente2, paralelo2, "Base de Datos"
+                )
+            else:
+                print("Opción incorrecta")
+                continue
+
+            planificador.agregar(horario)
+
+        elif opcion == "2":
+            planificador.mostrar_todos()
+
+        elif opcion == "3":
+            nombre = input("Nombre del paralelo: ").strip()
+            planificador.buscar_por_paralelo(nombre)
+
+        elif opcion == "4":
+            print("\n===== ESPACIOS ACADÉMICOS =====")
+            print(aula1.descripcion())
+            print(lab1.descripcion())
+
+        elif opcion == "5":
+            print("Programa finalizado")
+            break
+
+        else:
+            print("Opción incorrecta, intente nuevamente")
+
+
+if __name__ == "__main__":
+    ejecutar()
+
