@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 
 class Espacio(ABC):
+
     mi_categoria = "Infraestructura Educativa"
 
     def __init__(self, id_espacio: int, capacidad: int, nombre: str):
@@ -9,196 +10,344 @@ class Espacio(ABC):
         self._capacidad = capacidad
         self.nombre = nombre
 
-    def id_espacio(self):
-        print(f"ID del espacio: {self._id_espacio}")
+    @property
+    def capacidad(self):
+        return self._capacidad
 
-    def evaluar_capacidad(self, limite: int) -> bool:
-        print(f"Capacidad: {self._capacidad} estudiantes")
-        print(f"Evaluando capacidad contra {limite} estudiantes")
+    @capacidad.setter
+    def capacidad(self, nueva_capacidad):
+        if nueva_capacidad <= 0:
+            raise ValueError(
+                "La capacidad debe ser mayor que cero"
+            )
+        self._capacidad = nueva_capacidad
+
+    def id_espacio(self):
+        print(
+            f"ID del espacio: {self._id_espacio}"
+        )
+
+    def evaluar_capacidad(
+        self,
+        limite: int
+    ) -> bool:
+
+        print(
+            f"Capacidad: "
+            f"{self._capacidad} estudiantes"
+        )
+
         return self.tiene_capacidad(limite)
 
-    def tiene_capacidad(self, num_estudiantes: int) -> bool:
-        return self._capacidad >= num_estudiantes
+    def tiene_capacidad(
+        self,
+        num_estudiantes: int
+    ) -> bool:
+
+        return (
+            self._capacidad >=
+            num_estudiantes
+        )
 
     def mostrar_nombre(self):
-        print(f"Espacio de practica: {self.nombre}")
+
+        print(
+            f"Espacio: "
+            f"{self.nombre}"
+        )
 
     @abstractmethod
-    def descripcion(self) -> str:
+    def descripcion(self):
         pass
 
 
 class Laboratorio(Espacio):
-    mi_laboratorio = "Laboratorio especializado"
 
-    def __init__(self, id_espacio: int, capacidad: int, equipamiento: list):
-        super().__init__(id_espacio, capacidad, "Laboratorio de practica")
-        self._equipamiento = list(equipamiento)
+    mi_laboratorio = (
+        "Laboratorio especializado"
+    )
+
+    def __init__(
+        self,
+        id_espacio: int,
+        capacidad: int,
+        equipamiento: list
+    ):
+
+        super().__init__(
+            id_espacio,
+            capacidad,
+            "Laboratorio de Practica"
+        )
+
+        self._equipamiento = (
+            list(equipamiento)
+        )
+
+    @property
+    def equipamiento(self):
+        return self._equipamiento
 
     def id_espacio(self):
-        print(f"ID del laboratorio: {self._id_espacio}")
 
-    def agregar_equipamiento(self, nuevo_equipo: str):
-        self._equipamiento.append(nuevo_equipo)
-        print(f"Agregando {nuevo_equipo} al laboratorio")
+        print(
+            f"ID del laboratorio: "
+            f"{self._id_espacio}"
+        )
+
+    def agregar_equipamiento(
+        self,
+        *equipos
+    ):
+
+        if not equipos:
+
+            print(
+                "No se agregaron equipos"
+            )
+
+            return
+
+        for equipo in equipos:
+
+            self._equipamiento.append(
+                equipo
+            )
+
+        print(
+            f"Se agregaron "
+            f"{len(equipos)} equipos"
+        )
 
     def mostrar_capacidad(self):
-        print(f"Capacidad para {self._capacidad} estudiantes")
+
+        print(
+            f"Capacidad: "
+            f"{self._capacidad}"
+        )
 
     def mostrar_equipamiento(self):
-        print(f"Equipamiento: {self._equipamiento}")
 
-    def descripcion(self) -> str:
-        return f"Laboratorio de {self._capacidad} cupos con {len(self._equipamiento)} equipos"
+        print(
+            f"Equipamiento: "
+            f"{self._equipamiento}"
+        )
+
+    def descripcion(self):
+
+        return (
+            f"Laboratorio con "
+            f"{self._capacidad} cupos "
+            f"y "
+            f"{len(self._equipamiento)} "
+            f"equipos"
+        )
+
 
 class Aula(Espacio):
-    def descripcion(self) -> str:
-        return f"Aula {self.nombre} con {self._capacidad} cupos"
- 
 
+    def descripcion(self):
+
+        return (
+            f"Aula {self.nombre} "
+            f"con "
+            f"{self._capacidad} "
+            f"cupos"
+        )
 class Paralelo:
+
     mi_paralelo = "Paralelo"
 
-    def __init__(self, id_paralelo: int, num_estudiantes: int, nombre_paralelo: str):
+    def __init__(
+        self,
+        id_paralelo: int,
+        num_estudiantes: int,
+        nombre_paralelo: str
+    ):
+
         self._id_paralelo = id_paralelo
         self._num_estudiantes = num_estudiantes
         self.nombre_paralelo = nombre_paralelo
 
     def id_paralelo(self):
-        print(f"ID del paralelo: {self._id_paralelo}")
 
-    def agregar_estudiantes(self, cantidad: int):
+        print(
+            f"ID Paralelo: "
+            f"{self._id_paralelo}"
+        )
+
+    def agregar_estudiantes(
+        self,
+        cantidad: int
+    ):
+
         self._num_estudiantes += cantidad
-        print(f"Se agregaron {cantidad} estudiantes")
-        print(f"Total de estudiantes: {self._num_estudiantes}")
+
+        print(
+            f"Total estudiantes: "
+            f"{self._num_estudiantes}"
+        )
 
     def mostrar_nombre_paralelo(self):
-        print(f"Paralelo: {self.nombre_paralelo}")
+
+        print(
+            f"Paralelo: "
+            f"{self.nombre_paralelo}"
+        )
 
 
 class Docente:
-    mi_docente = "Materia de docente"
 
-    def __init__(self, disponibilidad: list, preferencias: str, descansos: list):
+    mi_docente = "Docente"
+
+    def __init__(
+        self,
+        disponibilidad: list,
+        preferencias: str,
+        descansos: list
+    ):
+
         self._disponibilidad = disponibilidad
         self._preferencias = preferencias
-        self.descansos = descansos
+        self._descansos = descansos
+
+    @property
+    def preferencias(self):
+        return self._preferencias
+
+    @preferencias.setter
+    def preferencias(self, valor):
+        self._preferencias = valor
 
     def disponibilidad(self):
-        print(f"Disponibilidad: {self._disponibilidad}")
 
-    def cambiar_preferencias(self, nueva_pref: str):
-        self._preferencias = nueva_pref
-        print(f"Nueva preferencia docente: {nueva_pref}")
+        print(
+            f"Disponibilidad: "
+            f"{self._disponibilidad}"
+        )
+
+    def cambiar_preferencias(
+        self,
+        *preferencias
+    ):
+
+        if not preferencias:
+
+            print(
+                "No se ingresaron preferencias"
+            )
+            return
+
+        if len(preferencias) == 1:
+
+            self._preferencias = preferencias[0]
+
+        else:
+
+            self._preferencias = (
+                ", ".join(preferencias)
+            )
+
+        print(
+            f"Nueva preferencia: "
+            f"{self._preferencias}"
+        )
 
     def mostrar_descansos(self):
-        print(f"Descansos: {self.descansos}")
+
+        print(
+            f"Descansos: "
+            f"{self._descansos}"
+        )
 
 
 class Horario:
-    mi_horarioasignado = "Horario de clase"
 
-    def __init__(self, id_horario: int, periodo: str, estado: str,
-                 dia: str, hora: str,
-                 espacio: Espacio, docente: Docente, paralelo: Paralelo):
+    mi_horario = "Horario Académico"
+
+    def __init__(
+        self,
+        id_horario: int,
+        periodo: str,
+        estado: str
+    ):
+
         self._id_horario = id_horario
-        self._estado = estado
         self.periodo = periodo
-        self.dia = dia
-        self.hora = hora
-        self.espacio = espacio
-        self.docente = docente
-        self.paralelo = paralelo
+        self._estado = estado
 
     def id_horario(self):
-        print(f"Horario ID: {self._id_horario}")
 
-    def es_valido(self) -> bool:
-        return self.espacio.tiene_capacidad(self.paralelo._num_estudiantes)
+        print(
+            f"Horario ID: "
+            f"{self._id_horario}"
+        )
 
-    def cambiar_periodo(self, nuevo_periodo: str):
+    def cambiar_periodo(
+        self,
+        nuevo_periodo
+    ):
+
         self.periodo = nuevo_periodo
-        print(f"Nuevo periodo: {self.periodo}")
 
     def mostrar_estado(self):
-        print(f"Estado del horario: {self._estado}")
+
+        print(
+            f"Estado: "
+            f"{self._estado}"
+        )
+
 
 class Planificador:
+
     def __init__(self):
         self.horarios = []
 
-    def hay_conflicto(self, nuevo: Horario) -> bool:
-        for h in self.horarios:
-            if h.dia == nuevo.dia and h.hora == nuevo.hora:
-                if (h.espacio is nuevo.espacio
-                  or h.docente is nuevo.docente
-                  or h.paralelo is nuevo.paralelo):
-                    return True
-        return False
+    def agregar(
+        self,
+        horario
+    ):
 
-    def agregar(self, horario: Horario):
-        if not horario.es_valido():
-            print("No se agrego: horario no valido")
-        elif self.hay_conflicto(horario):
-            print("No se agrego: hay conflicto con otro horario")
-        else:
-            self.horarios.append(horario)
-            print("Horario agregado correctamente")
+        self.horarios.append(horario)
 
-    def mostrar_horarios(self):
-        for h in self.horarios:
-            print(f"{h.dia} {h.hora} | {h.espacio.nombre} | {h.paralelo.nombre_paralelo}")
+        print(
+            "Horario agregado"
+        )
+class LaboratorioUniversitario(
+    Laboratorio,
+    Docente
+):
 
-class Reporte(ABC):
-    def __init__(self, titulo: str, planificador: Planificador):
-        self.titulo = titulo
-        self._planificador = planificador
+    def __init__(
+        self,
+        id_espacio,
+        capacidad,
+        equipamiento,
+        disponibilidad,
+        preferencias,
+        descansos
+    ):
 
-    def mostrar(self):
-        print(f"--- {self.titulo} ---")
-        print(self.generar())
+        Laboratorio.__init__(
+            self,
+            id_espacio,
+            capacidad,
+            equipamiento
+        )
 
-    @abstractmethod
-    def generar(self) -> str:
-        pass
-
-
-class ReporteHorarios(Reporte):
-    def __init__(self, planificador: Planificador):
-        super().__init__("Reporte de horarios", planificador)
-
-    def generar(self) -> str:
-        if not self._planificador.horarios:
-            return "No hay horarios registrados"
-        lineas = []
-        for h in self._planificador.horarios:
-            lineas.append(f"{h.dia} {h.hora} | {h.espacio.nombre} | {h.paralelo.nombre_paralelo}")
-        return "\n".join(lineas)
-
-
-class ReporteOcupacion(Reporte):
-    def __init__(self, planificador: Planificador):
-        super().__init__("Reporte de ocupacion", planificador)
-
-    def generar(self) -> str:
-        if not self._planificador.horarios:
-            return "No hay horarios registrados"
-        lineas = []
-        for h in self._planificador.horarios:
-            usados = h.paralelo._num_estudiantes
-            total = h.espacio._capacidad
-            porcentaje = usados / total * 100
-            lineas.append(f"{h.espacio.nombre}: {usados}/{total} estudiantes ({porcentaje:.0f}%)")
-        return "\n".join(lineas)
-
-class LaboratorioUniversitario(Laboratorio, Docente):
-    def __init__(self, id_espacio: int, capacidad: int, equipamiento: list,
-        disponibilidad: list, preferencias: str, descansos: list):
-        Laboratorio.__init__(self, id_espacio, capacidad, equipamiento)
-        Docente.__init__(self, disponibilidad, preferencias, descansos)
+        Docente.__init__(
+            self,
+            disponibilidad,
+            preferencias,
+            descansos
+        )
 
     def mostrar_informacion_completa(self):
-        print("=== LABORATORIO UNIVERSITARIO ===")
+
+        print(
+            "\n=== LABORATORIO UNIVERSITARIO ==="
+        )
+
         self.mostrar_nombre()
         self.mostrar_capacidad()
         self.mostrar_equipamiento()
@@ -207,61 +356,292 @@ class LaboratorioUniversitario(Laboratorio, Docente):
 
 
 if __name__ == "__main__":
-    print("=== 1. CLASE ESPACIO ===")
-    e1 = Aula(1, 50, "Aula 1")
-    e1.id_espacio()
-    e1.evaluar_capacidad(25)
-    e1.mostrar_nombre()
-    print("¿Cabe un paralelo de 35?", e1.tiene_capacidad(35))
- 
 
-    print("\n=== 2. HERENCIA SIMPLE ===")
-    l1 = Laboratorio(101, 20, ["Computadoras"])
-    l1.id_espacio()
-    l1.mostrar_nombre()
-    l1.agregar_equipamiento("Router")
-    l1.mostrar_equipamiento()
-    l1.mostrar_capacidad()
+    aula = Aula(
+        1,
+        30,
+        "Lab 1"
+    )
 
-    print("\n=== 3. CLASE PARALELO ===")
-    p1 = Paralelo(704, 35, "Sistemas A")
-    p1.id_paralelo()
-    p1.agregar_estudiantes(5)
-    p1.mostrar_nombre_paralelo()
+    aula.id_espacio()
 
-    print("\n=== 4. CLASE DOCENTE ===")
-    d1 = Docente(["Jueves"], "Electronica", ["Martes"])
-    d1.disponibilidad()
-    d1.cambiar_preferencias("Sistemas")
-    d1.mostrar_descansos()
+    aula.mostrar_nombre()
 
-    print("\n=== 5. CLASE HORARIO ===")
-    h1 = Horario(501, "2026-2", "Activo", "Lunes", "08:00", e1, d1, p1)
-    h1.id_horario()
-    h1.cambiar_periodo("2026-3")
-    h1.mostrar_estado()
+    print(
+        aula.descripcion()
+    )
 
-    print("\n=== 6. HERENCIA MULTIPLE ===")
-    lu1 = LaboratorioUniversitario(
-        201,
-        25,
-        ["Computadoras", "Router"],
-        ["Lunes", "Jueves"],
+    lab = Laboratorio(
+        101,
+        20,
+        ["Computadoras"]
+    )
+
+    lab.id_espacio()
+
+    lab.agregar_equipamiento(
+        "Router",
+        "Switch",
+        "Servidor"
+    )
+
+    lab.mostrar_equipamiento()
+
+    print(
+        lab.descripcion()
+    )
+
+    docente = Docente(
+        ["Lunes"],
         "Redes",
         ["Viernes"]
     )
-    lu1.mostrar_informacion_completa()
-    lu1.agregar_equipamiento("Switch")
-    lu1.cambiar_preferencias("Seguridad informatica")
 
-    print("\n=== 7. ATRIBUTO DE CLASE ===")
-    lab1 = Laboratorio(1, 10, [])
-    lab2 = Laboratorio(2, 10, [])
+    docente.disponibilidad()
 
-    print("Original:", lab1.mi_laboratorio)
-    print("Original:", lab2.mi_laboratorio)
+    docente.cambiar_preferencias(
+        "IA",
+        "Programacion",
+        "Base de Datos"
+    )
 
-    Laboratorio.mi_laboratorio = "Laboratorio de alta tecnologia"
+    docente.mostrar_descansos()
 
-    print("Modificado:", lab1.mi_laboratorio)
-    print("Modificado:", lab2.mi_laboratorio)
+    p1 = Paralelo(
+        1,
+        35,
+        "Sistemas A"
+    )
+
+    p1.id_paralelo()
+
+    p1.agregar_estudiantes(
+        5
+    )
+
+    p1.mostrar_nombre_paralelo()
+
+    h1 = Horario(
+        100,
+        "2026-2",
+        "Activo"
+    )
+
+    h1.id_horario()
+
+    h1.cambiar_periodo(
+        "2026-3"
+    )
+
+    h1.mostrar_estado()
+
+    laboratorio_universitario = (
+        LaboratorioUniversitario(
+            201,
+            25,
+            [
+                "Computadoras",
+                "Router"
+            ],
+            [
+                "Lunes",
+                "Martes"
+            ],
+            "Redes",
+            [
+                "Viernes"
+            ]
+        )
+    )
+
+    laboratorio_universitario.mostrar_informacion_completa()
+
+    print(
+        Laboratorio.mi_laboratorio
+    )
+
+    Laboratorio.mi_laboratorio = (
+        "Laboratorio de Alta Tecnologia"
+    )
+
+    print(
+        Laboratorio.mi_laboratorio
+    )
+
+    aula_grande = Aula(
+        50,
+        40,
+        "Aula Principal"
+    )
+
+    if aula_grande.tiene_capacidad(
+        35
+    ):
+
+        print(
+            "Se puede asignar el paralelo"
+        )
+
+    else:
+
+        print(
+            "No hay capacidad suficiente"
+        )
+
+    aula_pequena = Aula(
+        51,
+        20,
+        "Aula Pequeña"
+    )
+
+    if aula_pequena.tiene_capacidad(
+        35
+    ):
+
+        print(
+            "Se puede asignar el paralelo"
+        )
+
+    else:
+
+        print(
+            "No hay capacidad suficiente"
+        )
+
+    docente2 = Docente(
+        [
+            "Lunes",
+            "Martes"
+        ],
+        "Redes",
+        [
+            "Viernes"
+        ]
+    )
+
+    docente2.cambiar_preferencias(
+        "Inteligencia Artificial",
+        "Programacion",
+        "Base de Datos"
+    )
+
+    print(
+        docente2.preferencias
+    )
+
+    lab2 = Laboratorio(
+        102,
+        30,
+        [
+            "Computadoras"
+        ]
+    )
+
+    lab2.agregar_equipamiento(
+        "Router",
+        "Switch",
+        "Servidor",
+        "Firewall"
+    )
+
+    lab2.mostrar_equipamiento()
+
+    espacios = [
+
+        Aula(
+            60,
+            35,
+            "Aula A"
+        ),
+
+        Laboratorio(
+            61,
+            25,
+            [
+                "PC"
+            ]
+        )
+    ]
+
+    for espacio in espacios:
+
+        print(
+            espacio.descripcion()
+        )
+
+    laboratorio_universitario2 = (
+        LaboratorioUniversitario(
+            999,
+            35,
+            [
+                "Computadoras"
+            ],
+            [
+                "Lunes",
+                "Miercoles"
+            ],
+            "Seguridad Informatica",
+            [
+                "Viernes"
+            ]
+        )
+    )
+
+    laboratorio_universitario2.mostrar_informacion_completa()
+
+    print(
+        Laboratorio.mi_laboratorio
+    )
+
+    Laboratorio.mi_laboratorio = (
+        "Laboratorio Inteligente"
+    )
+
+    print(
+        Laboratorio.mi_laboratorio
+    )
+
+    try:
+
+        aula_error = Aula(
+            80,
+            30,
+            "Aula Test"
+        )
+
+        aula_error.capacidad = -10
+
+    except ValueError as e:
+
+        print(
+            "Error capturado:",
+            e
+        )
+
+    planificador = Planificador()
+
+    horario1 = Horario(
+        1,
+        "2026-2",
+        "Activo"
+    )
+
+    horario2 = Horario(
+        2,
+        "2026-2",
+        "Activo"
+    )
+
+    planificador.agregar(
+        horario1
+    )
+
+    planificador.agregar(
+        horario2
+    )
+
+    print(
+        len(
+            planificador.horarios
+        )
+    )
