@@ -866,4 +866,6 @@ def _demo() -> None:
 
 
 if __name__ == "__main__":
-    _demo()
+    _demo() 
+
+este codigo fue analizado y mejorado despues en la codigo unico y edtable
