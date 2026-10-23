@@ -1,0 +1,31 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from sistema_horarios.modelos.paralelo import Paralelo
+from sistema_horarios.usuarios.usuario import Usuario
+
+if TYPE_CHECKING:
+    from sistema_horarios.modelos.horario import Horario
+
+
+class Estudiante(Usuario):
+    def __init__(self, id_usuario: int, nombre: str, email: str, contrasena: str,
+                 carrera: str, paralelos: list[Paralelo] | None = None):
+        super().__init__(id_usuario, nombre, email, contrasena)
+        self._carrera = carrera
+        self._paralelos = list(paralelos or [])
+
+    def rol(self) -> str:
+        return "Estudiante"
+
+    @property
+    def carrera(self) -> str:
+        return self._carrera
+
+    @property
+    def paralelos(self) -> tuple[Paralelo, ...]:
+        return tuple(self._paralelos)
+
+    def consultar_horario(self, horarios: list[Horario]) -> list[Horario]:
+        return [h for h in horarios if h.paralelo in self._paralelos]
