@@ -1,51 +1,22 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-from soha.entidades.bloque_horario import BloqueHorario
-from soha.entidades.espacio import Espacio
-from soha.entidades.paralelo import Paralelo
-
-if TYPE_CHECKING:  # evita el import circular modelos <-> usuarios
-    from soha.herencia.docente import Docente
-
-
-class Horario:
-
-    def __init__(self, paralelo: Paralelo, docente: Docente,
-                 espacio: Espacio, bloque: BloqueHorario):
-        self._paralelo = paralelo
-        self._docente = docente
-        self._espacio = espacio
-        self._bloque = bloque
+class Materia:
+    def __init__(self, codigo: str, nombre: str, horas_semanales: int):
+        if horas_semanales <= 0:
+            raise ValueError("horas_semanales debe ser mayor que 0")
+        self._codigo = codigo
+        self._nombre = nombre
+        self._horas_semanales = horas_semanales
 
     @property
-    def paralelo(self) -> Paralelo:
-        return self._paralelo
+    def codigo(self) -> str:
+        return self._codigo
 
     @property
-    def docente(self) -> Docente:
-        return self._docente
+    def nombre(self) -> str:
+        return self._nombre
 
     @property
-    def espacio(self) -> Espacio:
-        return self._espacio
-
-    @property
-    def bloque(self) -> BloqueHorario:
-        return self._bloque
-
-    def motivo_choque(self, otro: Horario) -> str | None:
-        if not self._bloque.se_solapa_con(otro._bloque):
-            return None
-        if self._docente is otro._docente:
-            return f"el docente {self._docente.nombre} ya tiene clase ({otro._bloque})"
-        if self._espacio is otro._espacio:
-            return f"el espacio {self._espacio.codigo} ya está ocupado ({otro._bloque})"
-        if self._paralelo is otro._paralelo:
-            return f"el paralelo {self._paralelo.codigo} ya tiene clase ({otro._bloque})"
-        return None
+    def horas_semanales(self) -> int:
+        return self._horas_semanales
 
     def __str__(self) -> str:
-        return (f"{self._bloque} | {self._paralelo} | "
-                f"{self._docente.nombre} | {self._espacio.codigo}")
+        return f"{self._codigo} - {self._nombre}"
