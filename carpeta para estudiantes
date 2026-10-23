@@ -1,54 +1,51 @@
 from __future__ import annotations
 
-import logging
 from typing import TYPE_CHECKING
 
-from sistema_horarios.modelos.bloque_horario import BloqueHorario
-from sistema_horarios.usuarios.usuario import Usuario
+from soha.entidades.bloque_horario import BloqueHorario
+from soha.entidades.espacio import Espacio
+from soha.entidades.paralelo import Paralelo
 
-if TYPE_CHECKING:
-    from sistema_horarios.modelos.horario import Horario
-
-logger = logging.getLogger(__name__)
+if TYPE_CHECKING:  # evita el import circular modelos <-> usuarios
+    from soha.herencia.docente import Docente
 
 
-class Docente(Usuario):
-    def __init__(self, id_usuario: int, nombre: str, email: str, contrasena: str,
-                 disponibilidad: list[BloqueHorario] | None = None,
-                 preferencias: str = "",
-                 descansos: list[BloqueHorario] | None = None):
-        super().__init__(id_usuario, nombre, email, contrasena)
-        self._disponibilidad = list(disponibilidad or [])
-        self._preferencias = preferencias
-        self._descansos = list(descansos or [])
+class Horario:
 
-    def rol(self) -> str:
-        return "Docente"
+    def __init__(self, paralelo: Paralelo, docente: Docente,
+                 espacio: Espacio, bloque: BloqueHorario):
+        self._paralelo = paralelo
+        self._docente = docente
+        self._espacio = espacio
+        self._bloque = bloque
 
     @property
-    def disponibilidad(self) -> tuple[BloqueHorario, ...]:
-        return tuple(self._disponibilidad)
+    def paralelo(self) -> Paralelo:
+        return self._paralelo
 
     @property
-    def descansos(self) -> tuple[BloqueHorario, ...]:
-        return tuple(self._descansos)
+    def docente(self) -> Docente:
+        return self._docente
 
     @property
-    def preferencias(self) -> str:
-        return self._preferencias
+    def espacio(self) -> Espacio:
+        return self._espacio
 
-    def registrar_disponibilidad(self, bloques: list[BloqueHorario]) -> None:
-        self._disponibilidad.extend(bloques)
-        logger.info("%s: %d bloque(s) de disponibilidad registrados",
-                    self._nombre, len(bloques))
+    @property
+    def bloque(self) -> BloqueHorario:
+        return self._bloque
 
-    def cambiar_preferencias(self, nueva_pref: str) -> None:
-        self._preferencias = nueva_pref
+    def motivo_choque(self, otro: Horario) -> str | None:
+        if not self._bloque.se_solapa_con(otro._bloque):
+            return None
+        if self._docente is otro._docente:
+            return f"el docente {self._docente.nombre} ya tiene clase ({otro._bloque})"
+        if self._espacio is otro._espacio:
+            return f"el espacio {self._espacio.codigo} ya está ocupado ({otro._bloque})"
+        if self._paralelo is otro._paralelo:
+            return f"el paralelo {self._paralelo.codigo} ya tiene clase ({otro._bloque})"
+        return None
 
-    def esta_disponible(self, bloque: BloqueHorario) -> bool:
-        dentro = any(d.contiene(bloque) for d in self._disponibilidad)
-        en_descanso = any(r.se_solapa_con(bloque) for r in self._descansos)
-        return dentro and not en_descanso
-
-    def consultar_horario(self, horarios: list[Horario]) -> list[Horario]:
-        return [h for h in horarios if h.docente is self]
+    def __str__(self) -> str:
+        return (f"{self._bloque} | {self._paralelo} | "
+                f"{self._docente.nombre} | {self._espacio.codigo}")
