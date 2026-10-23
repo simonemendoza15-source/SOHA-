@@ -1,26 +1,33 @@
-from soha.entidades.materia import Materia
+from soha.nucleo.excepciones import ConflictoHorarioError
+from soha.entidades.horario import Horario
+from soha.entidades.paralelo import Paralelo
 
 
-class Paralelo:
-
-    def __init__(self, codigo: str, materia: Materia, num_estudiantes: int):
-        if num_estudiantes < 0:
-            raise ValueError("num_estudiantes no puede ser negativo")
-        self._codigo = codigo
-        self._materia = materia
-        self._num_estudiantes = num_estudiantes
+class GestorHorarios:
+    def __init__(self):
+        self._horarios: list[Horario] = []
 
     @property
-    def codigo(self) -> str:
-        return self._codigo
+    def horarios(self) -> tuple[Horario, ...]:
+        return tuple(self._horarios)
 
-    @property
-    def materia(self) -> Materia:
-        return self._materia
+    def agregar(self, horario: Horario) -> None:
+        if not horario.docente.esta_disponible(horario.bloque):
+            raise ConflictoHorarioError(
+                f"{horario.docente.nombre} no está disponible en {horario.bloque}")
+        if horario.espacio.capacidad < horario.paralelo.num_estudiantes:
+            raise ConflictoHorarioError(
+                f"El espacio {horario.espacio.codigo} (cap. {horario.espacio.capacidad}) "
+                f"no alcanza para {horario.paralelo.num_estudiantes} estudiantes")
+        for existente in self._horarios:
+            motivo = horario.motivo_choque(existente)
+            if motivo:
+                raise ConflictoHorarioError(f"Choque: {motivo}")
+        self._horarios.append(horario)
 
-    @property
-    def num_estudiantes(self) -> int:
-        return self._num_estudiantes
+    def horas_asignadas(self, paralelo: Paralelo) -> float:
+        return sum(h.bloque.duracion_horas()
+                   for h in self._horarios if h.paralelo is paralelo)
 
-    def __str__(self) -> str:
-        return f"{self._materia.nombre} - Paralelo {self._codigo}"
+    def materia_completa(self, paralelo: Paralelo) -> bool:
+        return self.horas_asignadas(paralelo) >= paralelo.materia.horas_semanales
