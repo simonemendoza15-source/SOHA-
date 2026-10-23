@@ -428,3 +428,4 @@ if __name__ == "__main__":
  
     for u in (admin, prof, est):
         print(f"{u} -> {len(u.consultar_horario(list(gestor.horarios)))} clase(s)")
+
