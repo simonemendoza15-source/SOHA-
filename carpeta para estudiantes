@@ -1,22 +1,26 @@
-class Materia:
-    def __init__(self, codigo: str, nombre: str, horas_semanales: int):
-        if horas_semanales <= 0:
-            raise ValueError("horas_semanales debe ser mayor que 0")
+from soha.entidades.materia import Materia
+
+
+class Paralelo:
+
+    def __init__(self, codigo: str, materia: Materia, num_estudiantes: int):
+        if num_estudiantes < 0:
+            raise ValueError("num_estudiantes no puede ser negativo")
         self._codigo = codigo
-        self._nombre = nombre
-        self._horas_semanales = horas_semanales
+        self._materia = materia
+        self._num_estudiantes = num_estudiantes
 
     @property
     def codigo(self) -> str:
         return self._codigo
 
     @property
-    def nombre(self) -> str:
-        return self._nombre
+    def materia(self) -> Materia:
+        return self._materia
 
     @property
-    def horas_semanales(self) -> int:
-        return self._horas_semanales
+    def num_estudiantes(self) -> int:
+        return self._num_estudiantes
 
     def __str__(self) -> str:
-        return f"{self._codigo} - {self._nombre}"
+        return f"{self._materia.nombre} - Paralelo {self._codigo}"
