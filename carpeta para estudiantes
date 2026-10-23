@@ -1,33 +1,49 @@
+import logging
+from datetime import time
+
 from soha.nucleo.excepciones import ConflictoHorarioError
-from soha.entidades.horario import Horario
-from soha.entidades.paralelo import Paralelo
+from soha.entidades import BloqueHorario, Espacio, Horario, Materia, Paralelo
+from soha.servicios import GestorHorarios
+from soha.herencia import Administrador, Docente, Estudiante
 
 
-class GestorHorarios:
-    def __init__(self):
-        self._horarios: list[Horario] = []
+def main() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-    @property
-    def horarios(self) -> tuple[Horario, ...]:
-        return tuple(self._horarios)
+    admin = Administrador(1, "Ana", "ana@uni.edu", "admin123")
+    prof = Docente(2, "Carlos", "carlos@uni.edu", "clave456",
+                   disponibilidad=[BloqueHorario("Lunes", time(7), time(13))],
+                   descansos=[BloqueHorario("Lunes", time(10), time(11))])
+    admin.registrar_docente(prof)
 
-    def agregar(self, horario: Horario) -> None:
-        if not horario.docente.esta_disponible(horario.bloque):
-            raise ConflictoHorarioError(
-                f"{horario.docente.nombre} no está disponible en {horario.bloque}")
-        if horario.espacio.capacidad < horario.paralelo.num_estudiantes:
-            raise ConflictoHorarioError(
-                f"El espacio {horario.espacio.codigo} (cap. {horario.espacio.capacidad}) "
-                f"no alcanza para {horario.paralelo.num_estudiantes} estudiantes")
-        for existente in self._horarios:
-            motivo = horario.motivo_choque(existente)
-            if motivo:
-                raise ConflictoHorarioError(f"Choque: {motivo}")
-        self._horarios.append(horario)
+    poo = Materia("INF101", "Programación Orientada a Objetos", 4)
+    aula = Espacio("A-101", 30)
+    pequena = Espacio("A-102", 10)
+    admin.registrar_materia(poo)
+    admin.registrar_espacio(aula)
+    admin.registrar_espacio(pequena)
 
-    def horas_asignadas(self, paralelo: Paralelo) -> float:
-        return sum(h.bloque.duracion_horas()
-                   for h in self._horarios if h.paralelo is paralelo)
+    paralelo = Paralelo("A", poo, 25)
+    est = Estudiante(3, "Luis", "luis@uni.edu", "pass789", "Software", [paralelo])
 
-    def materia_completa(self, paralelo: Paralelo) -> bool:
-        return self.horas_asignadas(paralelo) >= paralelo.materia.horas_semanales
+    gestor = GestorHorarios()
+    intentos = [
+        Horario(paralelo, prof, aula, BloqueHorario("Lunes", time(8), time(10))),
+        Horario(paralelo, prof, aula, BloqueHorario("Lunes", time(9), time(11))),
+        Horario(paralelo, prof, aula, BloqueHorario("Lunes", time(10), time(11))),
+        Horario(paralelo, prof, pequena, BloqueHorario("Lunes", time(11), time(12))),
+    ]
+    for h in intentos:
+        try:
+            gestor.agregar(h)
+            print(f"✔ Agregado: {h}")
+        except ConflictoHorarioError as e:
+            print(f"✘ Rechazado: {e}")
+
+    # POLIMORFISMO: misma llamada, comportamiento distinto según la clase hija
+    for u in (admin, prof, est):
+        print(f"{u} -> {len(u.consultar_horario(list(gestor.horarios)))} clase(s)")
+
+
+if __name__ == "__main__":
+    main()
